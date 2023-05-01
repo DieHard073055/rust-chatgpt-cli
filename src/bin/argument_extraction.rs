@@ -49,7 +49,7 @@ fn main() {
             Arg::with_name("del")
                 .short('d')
                 .long("del")
-                .help("Delete a conversation by index")
+                .help("Delete a convo by INDEX")
                 .takes_value(true)
                 .value_name("INDEX")
                 .conflicts_with_all(&["prompt", "new-conversation", "list"]),
