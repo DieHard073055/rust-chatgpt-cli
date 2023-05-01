@@ -25,7 +25,7 @@ fn main() {
         .about("A chatbot application")
         .arg(
             Arg::with_name("prompt")
-                .help("Provide a prompt for the chatbot")
+                .help("Enter your prompt:")
                 .multiple_values(true)
                 .index(1)
                 .required(false),
