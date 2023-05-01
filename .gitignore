@@ -14,5 +14,4 @@ Cargo.lock
 *.pdb
 
 # Added by cargo
-
 /target
