@@ -59,7 +59,7 @@ fn main() {
     // Handle the different argument scenarios
     if matches.is_present("list") {
         // List all conversations
-        println!("Listing all conversations...");
+        println!("Listing conversations...");
     } else if matches.is_present("del") {
         // Delete a conversation by index
         let index = matches.value_of("del").expect("Missing conversation index");
