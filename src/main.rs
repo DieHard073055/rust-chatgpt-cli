@@ -27,7 +27,7 @@ fn configure_application() -> ArgMatches {
         .about("A chatbot application")
         .arg(
             Arg::with_name("prompt")
-                .help("Provide a prompt for the chatbot")
+                .help("Enter your prompt")
                 .multiple_values(true)
                 .index(1)
                 .required(false),
@@ -51,7 +51,7 @@ fn configure_application() -> ArgMatches {
             Arg::with_name("del")
                 .short('d')
                 .long("del")
-                .help("Delete a conversation by index")
+                .help("Delete a convo by INDEX")
                 .takes_value(true)
                 .value_name("INDEX")
                 .conflicts_with_all(&["prompt", "new-conversation", "list"]),
@@ -66,7 +66,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Handle the different argument scenarios
     if matches.is_present("list") {
         // List all conversations
-        println!("Listing all conversations...");
+        println!("Listing conversations...");
     } else if matches.is_present("del") {
         // Delete a conversation by index
         let index = matches.value_of("del").expect("Missing conversation index");
