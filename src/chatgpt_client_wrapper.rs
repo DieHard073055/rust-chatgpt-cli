@@ -1,9 +1,11 @@
 use crate::ModelConfigurationBuilder;
 use crate::Result;
 use crate::{ChatGPTEngine, CompletionResponse, Conversation, LibChatGPT, ModelConfiguration, Url};
+use futures::future::FutureExt;
 use std::env;
 use std::future::Future;
 use std::path::Path;
+use std::pin::Pin;
 use std::str::FromStr;
 
 pub struct ChatGPTClientWrapper(pub LibChatGPT);
@@ -25,7 +27,7 @@ pub trait ChatGPTClient {
     fn send_message<S: Into<String> + Send + 'static>(
         &self,
         prompt: S,
-    ) -> Box<dyn Future<Output = Result<CompletionResponse>> + Send + '_>;
+    ) -> Pin<Box<dyn Future<Output = Result<CompletionResponse>> + Send + '_>>;
     // fn send_message_streaming<S: Into<String>>(&self, message: S);
 }
 impl ChatGPTClient for ChatGPTClientWrapper {
@@ -56,9 +58,9 @@ impl ChatGPTClient for ChatGPTClientWrapper {
     fn send_message<S: Into<String> + Send + 'static>(
         &self,
         prompt: S,
-    ) -> Box<dyn Future<Output = Result<CompletionResponse>> + Send + '_> {
+    ) -> Pin<Box<dyn Future<Output = Result<CompletionResponse>> + Send + '_>> {
         let fut = async move { self.0.send_message(prompt).await };
-        Box::new(fut)
+        Box::pin(fut.boxed())
     }
 }
 impl ChatGPTClientWrapper {
@@ -66,11 +68,11 @@ impl ChatGPTClientWrapper {
         // get api key or exit
         env::var("OPENAI_API_KEY").expect("Missing OPENAI_API_KEY environment variable")
     }
-    fn default_client() -> Result<ChatGPTClientWrapper> {
+    pub fn default_client() -> Result<ChatGPTClientWrapper> {
         let client = LibChatGPT::new(Self::load_api_key())?;
         Ok(ChatGPTClientWrapper(client))
     }
-    fn custom_client(
+    pub fn custom_client(
         api_url: Option<&str>,
         temperature: Option<f32>,
         engine: Option<ChatGPTEngine>,

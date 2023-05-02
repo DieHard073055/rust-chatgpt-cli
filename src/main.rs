@@ -1,6 +1,6 @@
 use atty::Stream;
 use clap::{App, Arg, ArgMatches};
-use rust_chatgpt_cli::conversation::basic_query;
+use rust_chatgpt_cli::chatgpt::ChatGPT;
 use std::io::{self, Read};
 
 fn check_stdin() -> String {
@@ -58,7 +58,9 @@ fn configure_application() -> ArgMatches {
         )
         .get_matches()
 }
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let stdin_prompt = check_stdin();
 
     let matches = configure_application();
@@ -87,7 +89,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "Processing prompt: '{}', new conversation: {}",
             &prompt, new_conversation
         );
-        println!("{:}", basic_query(prompt)?);
+        println!("{:}", ChatGPT::basic_query(&prompt).await?);
     }
     Ok(())
 }
