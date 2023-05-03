@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - windows-latest
+          - ubuntu-latest
+          - macos-latest
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-gnu
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: ${{ matrix.target }}
+          profile: minimal
+          default: true
+
+      - name: Build and release
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: rust-chatgpt-cli-${{ matrix.target }}
+          path: target/${{ matrix.target }}/release/rust-chatgpt-cli*
+          if-no-files-found: error
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release assets
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const fs = require('fs');
+            const glob = require('@actions/glob');
+            const { owner, repo } = context.repo;
+            const release_id = core.getInput('release_id', { required: true });
+
+            async function main() {
+              const artifact_glob = `target/${{ matrix.target }}/release/rust-chatgpt-cli*`;
+              const globber = await glob.create(artifact_glob);
+              const artifact_paths = await globber.glob();
+
+              for (const path of artifact_paths) {
+                const content_type = path.endsWith(".zip") ? "application/zip" : "application/octet-stream";
+                const file_name = path.split('/').pop();
+
+                console.log(`Uploading ${file_name}`);
+                const file = fs.readFileSync(path);
+
+                await github.repos.uploadReleaseAsset({
+                  owner,
+                  repo,
+                  release_id,
+                  name: file_name,
+                  data: file,
+                  headers: {
+                    'content-type': content_type,
+                    'content-length': file.length,
+                  },
+                });
+              }
+            }
+
+            main().catch(err => core.setFailed(err.message));
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
