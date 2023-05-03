@@ -1,6 +1,7 @@
 use atty::Stream;
 use clap::{App, Arg, ArgMatches};
 use rust_chatgpt_cli::chatgpt::ChatGPT;
+use rust_chatgpt_cli::debug_println;
 use std::io::{self, Read};
 
 fn check_stdin() -> String {
@@ -14,7 +15,7 @@ fn check_stdin() -> String {
         if stdin_result.is_ok() {
             let contents = stdin_contents.trim();
             if !contents.is_empty() {
-                println!("Handling prompt from stdin: {}", contents);
+                debug_println!("Handling prompt from stdin: {}", contents);
                 stdin_prompt = contents.to_string();
             }
         }
@@ -68,11 +69,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Handle the different argument scenarios
     if matches.is_present("list") {
         // List all conversations
-        println!("Listing conversations...");
+        debug_println!("Listing conversations...");
     } else if matches.is_present("del") {
         // Delete a conversation by index
         let index = matches.value_of("del").expect("Missing conversation index");
-        println!("Deleting conversation with index {}...", index);
+        debug_println!("Deleting conversation with index {}...", index);
     } else {
         // Process the chatbot prompt
         let prompt = if stdin_prompt.is_empty() {
@@ -85,9 +86,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         };
 
         let new_conversation = matches.is_present("new-conversation");
-        println!(
+        debug_println!(
             "Processing prompt: '{}', new conversation: {}",
-            &prompt, new_conversation
+            &prompt,
+            new_conversation
         );
         println!("{:}", ChatGPT::basic_query(&prompt).await?);
     }
