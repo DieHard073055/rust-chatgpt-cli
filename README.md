@@ -1,4 +1,5 @@
 # Rust ChatGPT CLI
+[![wakatime](https://wakatime.com/badge/user/e5cdae17-ff21-447b-88c4-dbcea5d0baa2/project/f638802e-44ec-46d5-91ce-e2a224a67f0a.svg)](https://wakatime.com/badge/user/e5cdae17-ff21-447b-88c4-dbcea5d0baa2/project/f638802e-44ec-46d5-91ce-e2a224a67f0a)
 
 ## In use
 
