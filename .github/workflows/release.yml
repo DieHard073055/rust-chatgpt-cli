@@ -11,13 +11,10 @@ jobs:
     strategy:
       matrix:
         os:
-          - windows-latest
           - ubuntu-latest
           - macos-latest
         target:
           - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-gnu
-          - x86_64-apple-darwin
           - aarch64-apple-darwin
     steps:
       - name: Checkout code
@@ -60,13 +57,13 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const glob = require('@actions/glob');
+            const globberModule = require('@actions/glob');
             const { owner, repo } = context.repo;
             const release_id = core.getInput('release_id', { required: true });
 
             async function main() {
               const artifact_glob = `target/${{ matrix.target }}/release/rust-chatgpt-cli*`;
-              const globber = await glob.create(artifact_glob);
+              const globber = await globberModule.create(artifact_glob);
               const artifact_paths = await globber.glob();
 
               for (const path of artifact_paths) {
