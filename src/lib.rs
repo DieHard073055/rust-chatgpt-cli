@@ -8,3 +8,4 @@ pub use chatgptlib::prelude::{
 pub use chatgptlib::types::CompletionResponse;
 pub mod chatgpt;
 pub mod chatgpt_client_wrapper;
+pub mod macros;
