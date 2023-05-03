@@ -60,7 +60,6 @@ jobs:
 
       - name: Install deps
         run: npm install @actions/glob
-
       - name: Upload release assets
         uses: actions/github-script@v5
         with:
