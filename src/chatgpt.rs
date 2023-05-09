@@ -59,6 +59,7 @@ mod tests {
 
     #[test]
     fn test_generate_name() {
+        ChatGPTConversation::ensure_conversations_dir_exists();
         let name1 = ChatGPTConversation::generate_name();
         // to ensure the second file gets the correct name
         let test_filename1 = format!("{}/{}", CONVERSATION_DIR, name1);
@@ -73,6 +74,7 @@ mod tests {
 
     #[test]
     fn test_list_conversations() {
+        ChatGPTConversation::ensure_conversations_dir_exists();
         // Create some test conversation files
         let test_conversation1 = format!("{}/test_conversation1", CONVERSATION_DIR);
         create_test_file(&test_conversation1).unwrap();
